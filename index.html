@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GAME</title>
+        <link rel="stylesheet" href="src/style.css">
+    </head>
+    <body>
+        
+        <main>
+            <div class="titleScreen" id="1">
+                <span class="title">Wieża ZSL</span>
+                <buttons>
+                    <button onclick="startPlay()">PLAY</button>
+                    <button onclick="goToSettings()">SETTINGS</button>
+                </buttons>
+            </div>
+
+            <div class="settingsScreen" id="2">
+                <span class="title">Settings</span>
+                <buttons>
+                    <button onclick="startPlay()">PLAY</button>
+                    <button onclick="goToSettings()">SETTINGS</button>
+                </buttons>
+            </div>
+
+            <div class="gameScreen" id="gameScreen">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+        </main>
+        <footer id="footer">made by: Nikodem Karpiński, Michał Kałasiewicz, Maciej Kozłowski, Wojciech Jędruszko</footer>
+
+        <script src="dist/bundle.js"></script>
+
+        <script>
+            function goToSettings() {
+                var titleScreen = document.getElementById("1");
+                var settingsScreen = document.getElementById("2");
+
+                titleScreen.style.visibility = "hidden";
+                settingsScreen.style.visibility = "visible";
+                console.log(settingsScreen.style.visibility);
+            }
+        </script>
+    </body>
+</html>
