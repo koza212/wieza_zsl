@@ -32,7 +32,6 @@ class Player {
                 this.velocity.y += gravity;
             } else {
                 this.velocity.y = 0;
-                this.velocity.x = 0;
                 this.position.y = canvas.height - this.height;
                 this.state = 'walking';
             }
