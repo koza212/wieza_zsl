@@ -14,19 +14,25 @@ class Player{
             y:1,
         }
         this.height = 100;
+        this.canJump = false;
     }
+
     draw(){
         c.fillStyle='red';
         c.fillRect(this.position.x,this.position.y,100,this.height);
     }
+    
     update(){
         this.draw();
         this.position.y+=this.velocity.y;
         this.position.x+=this.velocity.x;
-        if( this.position.y + this.height + this.velocity.y <canvas.height){
+        if( this.position.y + this.height + this.velocity.y <canvas.height ){
             this.velocity.y+= gravity;
         }
-        else this.velocity.y=0
+        else {
+            this.velocity.y=0
+            this.canJump=true;
+        }
     }
 }
 
@@ -66,7 +72,11 @@ window.addEventListener('keydown',(event)=>{
             keys.a.pressed = true;
             break
         case 'w':
-            player.velocity.y=-15;
+            if(player.canJump){
+                player.velocity.y=-15;
+                player.canJump=false;
+            }
+            break;
     }
 })
 window.addEventListener('keyup',(event)=>{
