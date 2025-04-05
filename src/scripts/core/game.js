@@ -6,6 +6,20 @@ canvas.width = 1024;
 
 const gravity = 0.5;
 
+class Sprite {
+    constructor({position, imageSrc}){
+        this.position = position;
+        this.image = new Image();
+        this.image.src = imageSrc;
+    }
+    draw(){
+        if(!this.image) {return;}
+        c.drawImage(this.image,this.position.x, this.position.y);
+    }
+    update(){
+        this.draw();
+    }
+}
 class Player {
     constructor(position) {
         this.position = position;
@@ -20,6 +34,7 @@ class Player {
     draw() {
         c.fillStyle = 'red';
         c.fillRect(this.position.x, this.position.y, 100, this.height);
+        console.log('Drawing background at:', this.position);
     }
 
     update() {
@@ -86,6 +101,14 @@ window.addEventListener('keyup', (event) => {
     }
 });
 
+const background = new Sprite({
+    position:{
+        x: 0,
+        y: 0,
+    },
+    imageSrc: '../assets/map.png',
+});
+
 function gameLoop() {
     requestAnimationFrame(gameLoop);
     c.fillStyle = 'white';
@@ -101,8 +124,14 @@ function gameLoop() {
     if (player.state === 'charging' && player.jumpCharge < player.maxJumpCharge) {
         player.jumpCharge += 0.5;
     }
-    
+    c.save();
+    c.scale(4,4);
+    c.translate(0, -background.image.height + canvas.height/4);
+    background.update();
+    c.restore();   
+
     player.update();
+    
 }
 
 gameLoop();
