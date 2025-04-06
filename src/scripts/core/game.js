@@ -1,137 +1,96 @@
-const canvas = document.querySelector('canvas');
-const c = canvas.getContext('2d');
+class Game{
+    constructor(){
+        this.canvas = document.querySelector('canvas');
+        this.c = this.canvas.getContext('2d');
 
-canvas.height = 576;
-canvas.width = 1024;
+        this.canvas.height = 576;
+        this.canvas.width = 1024;
 
-const gravity = 0.5;
+        this.gravity = 0.5;
 
-class Sprite {
-    constructor({position, imageSrc}){
-        this.position = position;
-        this.image = new Image();
-        this.image.src = imageSrc;
-    }
-    draw(){
-        if(!this.image) {return;}
-        c.drawImage(this.image,this.position.x, this.position.y);
-    }
-    update(){
-        this.draw();
-    }
-}
-class Player {
-    constructor(position) {
-        this.position = position;
-        this.velocity = { x: 0, y: 0 };
-        this.height = 100;
-        this.state = 'walking'; 
-        this.jumpCharge = 0;
-        this.maxJumpCharge = 20;
-        this.lastDirection = 0; // -1 (left), 0 (up), 1 (right)
+        this.player = new Player({ x: 100, y: this.canvas.height - 100 }, this.c, this.canvas.width, this.canvas.height, this.gravity);
+        this.keys = { a: false, d: false };
+        this.background = new Sprite({
+            position:{
+                x: 0,
+                y: 0,
+            },
+            imageSrc: '../assets/map.png'},
+            this.c
+        );
+        this.bindEventListeners();
+        this.gameLoop();
     }
 
-    draw() {
-        c.fillStyle = 'red';
-        c.fillRect(this.position.x, this.position.y, 100, this.height);
-        console.log('Drawing background at:', this.position);
-    }
-
-    update() {
-        this.draw();
-        this.position.y += this.velocity.y;
-        this.position.x += this.velocity.x;
-
-        if (this.state === 'jumping') {
-            if (this.position.y + this.height < canvas.height) {
-                this.velocity.y += gravity;
-            } else {
-                this.velocity.y = 0;
-                this.position.y = canvas.height - this.height;
-                this.state = 'walking';
+    bindEventListeners(){
+        window.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'd':
+                    if (this.player.state === 'walking') {
+                        this.keys.d = true;
+                    } else if (this.player.state === 'charging') {
+                        this.player.lastDirection = 1;
+                    }
+                    break;
+                case 'a':
+                    if (this.player.state === 'walking') {
+                        this.keys.a = true;
+                    } else if (this.player.state === 'charging') {
+                        this.player.lastDirection = -1;
+                    }
+                    break;
+                case 'w':
+                    if (this.player.state === 'walking') {
+                        this.player.state = 'charging';
+                        this.player.velocity.x=0;
+                        this.player.jumpCharge = 0;
+                    }
+                    break;
             }
+        });
+        
+        window.addEventListener('keyup', (event) => {
+            switch (event.key) {
+                case 'd':
+                    this.keys.d = false;
+                    break;
+                case 'a':
+                    this.keys.a = false;
+                    break;
+                case 'w':
+                    if (this.player.state === 'charging') {
+                        this.player.state = 'jumping';
+                        this.player.velocity.y = -this.player.jumpCharge;
+                        this.player.velocity.x = this.player.lastDirection * (this.player.jumpCharge / 2);
+                    }
+                    break;
+            }
+        });
+    }
+
+    gameLoop() {
+        this.c.fillStyle = 'white';
+        this.c.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        if (this.player.state === 'walking') {
+            this.player.velocity.x *= 0.7;
+            this.player.lastDirection=0;
+            if (this.keys.d) this.player.velocity.x = 5;
+            if (this.keys.a) this.player.velocity.x = -5;
         }
+    
+        if (this.player.state === 'charging' && this.player.jumpCharge < this.player.maxJumpCharge) {
+            this.player.jumpCharge += 0.5;
+        }
+        this.c.save();
+        this.c.scale(4,4);
+        this.c.translate(0, -this.background.image.height + this.canvas.height/4);
+        this.background.update();
+        this.c.restore();   
+    
+        this.player.update();
+        requestAnimationFrame(() => this.gameLoop());
     }
 }
 
-const player = new Player({ x: 100, y: canvas.height - 100 });
-const keys = { a: false, d: false };
-
-window.addEventListener('keydown', (event) => {
-    switch (event.key) {
-        case 'd':
-            if (player.state === 'walking') {
-                keys.d = true;
-            } else if (player.state === 'charging') {
-                player.lastDirection = 1;
-            }
-            break;
-        case 'a':
-            if (player.state === 'walking') {
-                keys.a = true;
-            } else if (player.state === 'charging') {
-                player.lastDirection = -1;
-            }
-            break;
-        case 'w':
-            if (player.state === 'walking') {
-                player.state = 'charging';
-                player.velocity.x=0;
-                player.jumpCharge = 0;
-            }
-            break;
-    }
-});
-
-window.addEventListener('keyup', (event) => {
-    switch (event.key) {
-        case 'd':
-            keys.d = false;
-            break;
-        case 'a':
-            keys.a = false;
-            break;
-        case 'w':
-            if (player.state === 'charging') {
-                player.state = 'jumping';
-                player.velocity.y = -player.jumpCharge;
-                player.velocity.x = player.lastDirection * (player.jumpCharge / 2);
-            }
-            break;
-    }
-});
-
-const background = new Sprite({
-    position:{
-        x: 0,
-        y: 0,
-    },
-    imageSrc: '../assets/map.png',
-});
-
-function gameLoop() {
-    requestAnimationFrame(gameLoop);
-    c.fillStyle = 'white';
-    c.fillRect(0, 0, canvas.width, canvas.height);
-    
-    if (player.state === 'walking') {
-        player.velocity.x *= 0.7;
-        player.lastDirection=0;
-        if (keys.d) player.velocity.x = 5;
-        if (keys.a) player.velocity.x = -5;
-    }
-
-    if (player.state === 'charging' && player.jumpCharge < player.maxJumpCharge) {
-        player.jumpCharge += 0.5;
-    }
-    c.save();
-    c.scale(4,4);
-    c.translate(0, -background.image.height + canvas.height/4);
-    background.update();
-    c.restore();   
-
-    player.update();
-    
-}
-
-gameLoop();
+const game = new Game();  
