@@ -1,7 +1,10 @@
+canvas = document.querySelector('canvas');
+c = canvas.getContext('2d');
+
 class Game{
     constructor(){
-        this.canvas = document.querySelector('canvas');
-        this.c = this.canvas.getContext('2d');
+        this.canvas = canvas
+        this.c = c
 
         this.canvas.height = 576;
         this.canvas.width = 1024;
@@ -15,13 +18,14 @@ class Game{
                 x: 0,
                 y: 0,
             },
-            imageSrc: '../assets/map.png'},
+            //imageSrc: '../assets/map.png'},
+            imageSrc: '../assets/maptest.png'},
             this.c
         );
         this.bindEventListeners();
         this.gameLoop();
     }
-
+    
     bindEventListeners(){
         window.addEventListener('keydown', (event) => {
             switch (event.key) {
@@ -83,14 +87,37 @@ class Game{
             this.player.jumpCharge += 0.5;
         }
         this.c.save();
-        this.c.scale(4,4);
-        this.c.translate(0, -this.background.image.height + this.canvas.height/4);
+        this.c.scale(2,2);
+        this.c.translate(0, -this.background.image.height + this.canvas.height/2);
         this.background.update();
+        CollisionBlocks.forEach(CollisionBlock =>{
+            CollisionBlock.update()
+        })
         this.c.restore();   
+
+        
     
         this.player.update();
         requestAnimationFrame(() => this.gameLoop());
     }
 }
+const floorColisions2d = []
+for(let i=0;i<floorColisions.length;i+=16){
+    floorColisions2d.push(floorColisions.slice(i,i+16))
+
+}
+const CollisionBlocks = []
+floorColisions2d.forEach((row, y) => {
+    row.forEach((symbol, x) => {
+        if(symbol=== 13){
+            CollisionBlocks.push(new CollisionBlock({
+                position: {
+                    x: x * 32,
+                    y: y*32,
+                }
+            }))
+        }
+    })
+})
 
 const game = new Game();  

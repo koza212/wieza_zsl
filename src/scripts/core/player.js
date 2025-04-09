@@ -16,7 +16,7 @@ class Player {
     draw() {
         this.c.fillStyle = 'red';
         this.c.fillRect(this.position.x, this.position.y, 100, this.height);
-        console.log('Drawing background at:', this.position);
+        //console.log('Drawing background at:', this.position);
     }
 
     update() {
