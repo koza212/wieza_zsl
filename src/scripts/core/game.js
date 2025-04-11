@@ -93,6 +93,9 @@ class Game{
         CollisionBlocks.forEach(CollisionBlock =>{
             CollisionBlock.update()
         })
+        platformCollisionBlocks.forEach(PBlock =>{
+            PBlock.update()
+        })
         this.c.restore();   
 
         
@@ -119,5 +122,24 @@ floorColisions2d.forEach((row, y) => {
         }
     })
 })
+
+const platformCollision2d = []
+for(let i=0;i<platformCollision.length;i+=16){
+    platformCollision2d.push(platformCollision.slice(i,i+16))
+}
+const platformCollisionBlocks = []
+platformCollision2d.forEach((row, y) => {
+    row.forEach((symbol, x) => {
+        if(symbol=== 13){
+            platformCollisionBlocks.push(new CollisionBlock({
+                position: {
+                    x: x * 32,
+                    y: y*32,
+                }
+            }))
+        }
+    })
+})
+
 
 const game = new Game();  
